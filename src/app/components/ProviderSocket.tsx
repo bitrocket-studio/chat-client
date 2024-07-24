@@ -20,6 +20,9 @@ interface Props {
 export const ProviderSocket = ({ children }: Props) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState<boolean>(false);
+  const [totalUserConnected, setTotalUserConnected] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     const socketIo = io("http://localhost:8080", {});
@@ -27,6 +30,11 @@ export const ProviderSocket = ({ children }: Props) => {
 
     socketIo.on("connect", () => {
       setConnected(true);
+    });
+
+    socketIo.on("total-users", (totalUsers) => {
+      setTotalUserConnected(totalUsers);
+      // if (totalUsers !== totalUserConnected) setTotalUserConnected(totalUsers);
     });
 
     return () => {
@@ -47,6 +55,7 @@ export const ProviderSocket = ({ children }: Props) => {
           background: connected ? "#00dd00" : "transparent",
         }}
       />
+      <p>Connected users: {totalUserConnected || ""}</p>
       {children}
     </SocketContext.Provider>
   );
